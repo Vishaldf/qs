@@ -1,25 +1,35 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { useState, useEffect } from "react";
+import KanbanBoard from "./components/KanbanBoard";
+import DisplayToggle from "./components/DisplayToggle";
+import "./App.css";
 
-function App() {
+const App = () => {
+  const [tasks, setTasks] = useState([]);
+  const [users, setUsers] = useState([]);
+  const [groupBy, setGroupBy] = useState("status"); // Default group by status
+  const [sortBy, setSortBy] = useState("priority"); // Default sorting by priority
+
+  useEffect(() => {
+    fetchTasks();
+  }, []);
+
+  const fetchTasks = async () => {
+    try {
+      const response = await fetch("https://api.quicksell.co/v1/internal/frontend-assignment");
+      const data = await response.json();
+      setTasks(data.tickets);
+      setUsers(data.users);
+    } catch (error) {
+      console.error("Error fetching tasks:", error);
+    }
+  };
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <DisplayToggle groupBy={groupBy} setGroupBy={setGroupBy} sortBy={sortBy} setSortBy={setSortBy} />
+      <KanbanBoard tasks={tasks} users={users} groupBy={groupBy} sortBy={sortBy} />
     </div>
   );
-}
+};
 
 export default App;
